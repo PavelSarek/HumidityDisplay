@@ -119,5 +119,15 @@ void printHumidity()
   dtostrf(maxHumidity, 2, 1 , buffer);
   LCDPutStr(buffer, 100, 75, BLUE, YELLOW);
   LCDPutStr(")", 100, 110, RED, YELLOW);    
-  
 }
+
+void formatRange(float lowValue, float highValue, char* buffer)
+{
+  buffer[0] = '\0';
+  strcat(buffer, "(");
+  dtostrf(lowValue, 2, 1 , buffer + strlen(buffer));
+  strcat(buffer, " - ");
+  dtostrf(highValue, 2, 1 , buffer + strlen(buffer));
+  strcat(buffer, ")");
+}
+

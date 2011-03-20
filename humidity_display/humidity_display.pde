@@ -10,7 +10,6 @@
 #define clockPin 13
 
 SHT1x sht1x(dataPin, clockPin);
-
 RTC_DS1307 RTC;
 
 float maxTemperature;
@@ -28,18 +27,30 @@ void setup()
   LCDInit();
   LCDContrast(44);
   LCDClear(WHITE);
-  
+ 
+  initValues(); 
+}
+
+void initValues() {
   maxTemperature = minTemperature = sht1x.readTemperatureC();
   maxHumidity = minHumidity = sht1x.readHumidity();
 }
 
 void loop()
 {
+  int	s1, s2, s3;
+	s1	=	!digitalRead(kSwitch1_PIN);
+	s2	=	!digitalRead(kSwitch2_PIN);
+	s3	=	!digitalRead(kSwitch3_PIN);   
+  if (s1) {
+    initValues();
+  }
+
   printTime();
   
   printTemperatureAndHumidity();
 
-  delay(300);
+  delay(100);
 }
 
 void printTime() 
@@ -47,6 +58,7 @@ void printTime()
   char dateBuffer[9];
   
   DateTime now = RTC.now();  
+  
   uint8_t hour = now.hour();
   dateBuffer[0] = hour / 10 + '0';
   dateBuffer[1] = hour % 10 + '0'; 

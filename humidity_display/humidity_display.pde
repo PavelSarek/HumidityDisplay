@@ -6,9 +6,9 @@
 
 #include<stdlib.h>
 
-
 #define dataPin  12
 #define clockPin 13
+
 SHT1x sht1x(dataPin, clockPin);
 
 RTC_DS1307 RTC;
@@ -37,9 +37,9 @@ void loop()
 {
   printTime();
   
-  printHumidity();
+  printTemperatureAndHumidity();
 
-  delay(500);
+  delay(300);
 }
 
 void printTime() 
@@ -70,55 +70,48 @@ void printTime()
   LCDPutStr(dateBuffer, 0, 0, BLACK, RED);    
 }
   
-void printHumidity() 
+void printTemperatureAndHumidity() 
 {
-  float tempCels = sht1x.readTemperatureC();
+  float temperatureInCels = sht1x.readTemperatureC();
   float humidity = sht1x.readHumidity();  
   
-  if (tempCels > maxTemperature) {
-    maxTemperature = tempCels;
-  }
-  if (tempCels < minTemperature) {
-    minTemperature = tempCels;
-  }
+  updateMinMaxGlobalState(temperatureInCels, humidity);
   
-  if (humidity > maxHumidity) {
-    maxHumidity = humidity;
-  }
-  if (humidity < minHumidity) {
-    minHumidity = humidity;
-  }
-  
-  char buffer[20];
-  dtostrf(tempCels, 2, 1 , buffer);
-  LCDPutStr(buffer, 30, 10, BLUE, YELLOW);
+  updateDisplay(temperatureInCels, humidity);
+}
 
-  char str[20];
-  str[0] = '\0';
-  strcat(str, "(");
-  //LCDPutStr("(", 50, 10, RED, YELLOW);  
-  dtostrf(minTemperature, 2, 1 , buffer);
-  strcat(str, buffer);
-  //LCDPutStr(buffer, 50, 17, BLUE, YELLOW);
-  //LCDPutStr(" - ", 50, 50, BLUE, YELLOW);
-  strcat(str, " - ");
-  dtostrf(maxTemperature, 2, 1 , buffer);
-  strcat(str, buffer);
-  //LCDPutStr(buffer, 50, 75, BLUE, YELLOW);
-  //LCDPutStr(")", 50, 110, RED, YELLOW);    
-  strcat(str, ")");
-  LCDPutStr(str, 50, 10, RED, YELLOW);    
+void updateMinMaxGlobalState(float curTemperature, float curHumidity)
+{
+  if (curTemperature > maxTemperature) {
+    maxTemperature = curTemperature;
+  }
+  if (curTemperature < minTemperature) {
+    minTemperature = curTemperature;
+  }
   
-  dtostrf(humidity, 2, 1 , buffer);
-  LCDPutStr(buffer, 80, 10, GREEN, ORANGE);  
+  if (curHumidity > maxHumidity) {
+    maxHumidity = curHumidity;
+  }
+  if (curHumidity < minHumidity) {
+    minHumidity = curHumidity;
+  }
+}
+
+void updateDisplay(float curTemperature, float curHumidity)
+{
+  char buffer[20];
   
-  LCDPutStr("(", 100, 10, RED, YELLOW);  
-  dtostrf(minHumidity, 2, 1 , buffer);
-  LCDPutStr(buffer, 100, 17, BLUE, YELLOW);
-  LCDPutStr(" - ", 100, 50, BLUE, YELLOW);
-  dtostrf(maxHumidity, 2, 1 , buffer);
-  LCDPutStr(buffer, 100, 75, BLUE, YELLOW);
-  LCDPutStr(")", 100, 110, RED, YELLOW);    
+  dtostrf(curTemperature, 2, 1, buffer);
+  LCDPutStr(buffer, 30, 10, BLUE, WHITE);
+
+  formatRange(minTemperature, maxTemperature, buffer);
+  LCDPutStr(buffer, 50, 10, RED, WHITE);  
+  
+  dtostrf(curHumidity, 2, 1 , buffer);
+  LCDPutStr(buffer, 80, 10, BLUE, WHITE);  
+  
+  formatRange(minHumidity, maxHumidity, buffer);
+  LCDPutStr(buffer, 100, 10, RED, WHITE);  
 }
 
 void formatRange(float lowValue, float highValue, char* buffer)

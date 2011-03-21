@@ -32,9 +32,12 @@ void setup()
 }
 
 void initValues() {
+  
   maxTemperature = minTemperature = sht1x.readTemperatureC();
   maxHumidity = minHumidity = sht1x.readHumidity();
 }
+
+int liveShow = 0;
 
 void loop()
 {
@@ -43,14 +46,31 @@ void loop()
 	s2	=	!digitalRead(kSwitch2_PIN);
 	s3	=	!digitalRead(kSwitch3_PIN);   
   if (s1) {
+    LCDPutStr("R", 0, 100, YELLOW, WHITE); 
     initValues();
+    LCDPutStr(" ", 0, 100, WHITE, WHITE); 
   }
 
   printTime();
   
   printTemperatureAndHumidity();
 
-  delay(100);
+  liveShow++;
+  liveShow %= 4;
+  char* state;
+  switch (liveShow) {
+    case 0:  state = "| ";
+      break;
+    case 1:  state = "/ ";
+      break;    
+    case 2:  state = "- ";
+      break;    
+    case 3:  state = "\\ ";
+      break;
+  }
+  LCDPutStr(state, 0, 110, BLACK, WHITE);   
+
+  //delay(100);
 }
 
 void printTime() 

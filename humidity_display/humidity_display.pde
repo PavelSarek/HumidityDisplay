@@ -20,7 +20,7 @@ float minHumidity;
 
 void setup() 
 {
-  Serial.begin(57600);
+  Serial.begin(115200);
   Wire.begin();
   RTC.begin();
   ioinit();
@@ -135,12 +135,14 @@ void updateDisplay(float curTemperature, float curHumidity)
   
   dtostrf(curTemperature, 2, 1, buffer);
   LCDPutStr(buffer, 30, 10, BLUE, WHITE);
+  LCDPutStr("C", 30, 48, BLUE, WHITE);
 
   formatRange(minTemperature, maxTemperature, buffer);
   LCDPutStr(buffer, 50, 10, RED, WHITE);  
   
   dtostrf(curHumidity, 2, 1 , buffer);
   LCDPutStr(buffer, 80, 10, BLUE, WHITE);  
+  LCDPutStr("%", 80, 45, BLUE, WHITE);
   
   formatRange(minHumidity, maxHumidity, buffer);
   LCDPutStr(buffer, 100, 10, RED, WHITE);  
